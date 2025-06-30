@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculus Master | Interactive Calculus Tool</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #111 0%, #222 100%);
+            min-height: 100vh;
+            color: #eee;
+        }
+        
+        .calculator-btn {
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .calculator-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .calculator-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .gradient-text {
+            background: linear-gradient(90deg, #f43f5e 0%, #ef4444 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2a0a0a 100%);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .question-card {
+            transition: all 0.3s ease;
+        }
+        
+        .question-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .correct-answer {
+            background-color: rgba(74, 222, 128, 0.2);
+            border-color: #4ade80;
+        }
+        
+        .wrong-answer {
+            background-color: rgba(248, 113, 113, 0.2);
+            border-color: #f87171;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Navigation -->
+    <nav class="gradient-bg shadow-lg">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <div class="w-10 h-10 bg-red-500 rounded-full flex items-center justify-center">
+                        <span class="text-white font-bold text-xl">∫</span>
+                    </div>
+                    <span class="text-white font-bold text-xl gradient-text">Belajar kalkulus</span>
+                </div>
+                <div class="hidden md:flex space-x-6">
+                    <a href="#" class="text-white hover:text-red-300 transition nav-link" data-tab="home">Home</a>
+                    <a href="#" class="text-white hover:text-red-300 transition nav-link" data-tab="calculator">Calculator</a>
+                    <a href="#" class="text-white hover:text-red-300 transition nav-link" data-tab="practice">Practice</a>
+                    <a href="#" class="text-white hover:text-red-300 transition nav-link" data-tab="about">About</a>
+                </div>
+                <button class="md:hidden text-white focus:outline-none" id="mobile-menu-button">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="md:hidden hidden mt-2" id="mobile-menu">
+                <a href="#" class="block py-2 text-white hover:text-red-300 transition nav-link" data-tab="home">Home</a>
+                <a href="#" class="block py-2 text-white hover:text-red-300 transition nav-link" data-tab="calculator">Calculator</a>
+                <a href="#" class="block py-2 text-white hover:text-red-300 transition nav-link" data-tab="practice">Practice</a>
+                <a href="#" class="block py-2 text-white hover:text-red-300 transition nav-link" data-tab="about">About</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- Home Tab -->
+        <div id="home" class="tab-content active">
+            <div class="text-center mb-12">
+                <h1 class="text-4xl md:text-5xl font-bold mb-4 gradient-text">Kuasai Kalkulus dengan Mudah</h1>
+                <p class="text-xl text-gray-300 max-w-3xl mx-auto">Solusi Kalkulus Lengkap dalam Genggaman: Hitung Turunan, Integral, Limit, dan lainnya dengan Kalkulator Interaktif dan Penjelasan Langkah demi Langkah.</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+                <div class="bg-gray-800 rounded-xl p-6 shadow-lg hover:shadow-red-500/20 transition">
+                    <div class="w-12 h-12 bg-red-500 rounded-full flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2 text-white">Powerful Calculator</h3>
+                    <p class="text-gray-300">"Selesaikan turunan, integral, limit, dan berbagai persoalan kalkulus lainnya dengan kalkulator canggih kami (cepat, akurat, dan mudah digunakan)"</p>
+                </div>
+                
+                <div class="bg-gray-800 rounded-xl p-6 shadow-lg hover:shadow-red-500/20 transition">
+                    <div class="w-12 h-12 bg-red-500 rounded-full flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2 text-white">Interactive latihan</h3>
+                    <p class="text-gray-300">"Asah pemahaman kalkulus Anda melalui kumpulan soal interaktif, lengkap dengan umpan balik instan untuk setiap jawaban"</p>
+                </div>
+                
+                <div class="bg-gray-800 rounded-xl p-6 shadow-lg hover:shadow-red-500/20 transition">
+                    <div class="w-12 h-12 bg-red-500 rounded-full flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2 text-white">Penjelasan Langkah per Langkah</h3>
+                    <p class="text-gray-300">"Pelajari cara kerja setiap perhitungan melalui penjabaran lengkap dan terstruktur"</p>
+                </div>
+            </div>
+            
+            <div class="text-center">
+                <button class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 rounded-full transition nav-link" data-tab="calculator">
+                    Gunakan Kalkulator
+                </button>
+            </div>
+        </div>
+
+        <!-- Calculator Tab -->
+        <div id="calculator" class="tab-content">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold mb-4 gradient-text">Kalkulator Cerdas Kalkulus</h2>
+                <p class="text-gray-300">Cukup input fungsi Anda dan pilih operasi, biarkan kalkulator kami yang menyelesaikannya!</p>
+            </div>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="lg:col-span-2">
+                    <div class="gradient-bg rounded-xl p-6 shadow-lg mb-6">
+                        <div class="flex space-x-4 mb-6">
+                            <button class="operation-btn bg-red-600 text-white px-4 py-2 rounded-lg" data-operation="derivative">Derivative</button>
+                            <button class="operation-btn bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg" data-operation="integral">Integral</button>
+                            <button class="operation-btn bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg" data-operation="limit">Limit</button>
+                        </div>
+                        
+                        <div id="derivative-options" class="operation-options mb-4">
+                            <div class="grid grid-cols-2 gap-4 mb-4">
+                                <div>
+                                    <label class="block text-gray-300 mb-2">Variable</label>
+                                    <select class="w-full bg-gray-800 text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500">
+                                        <option>x</option>
+                                        <option>y</option>
+                                        <option>t</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-gray-300 mb-2">Order</label>
+                                    <select class="w-full bg-gray-800 text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500">
+                                        <option>1st</option>
+                                        <option>2nd</option>
+                                        <option>3rd</option>
+                                        <option>nth</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div id="integral-options" class="operation-options hidden mb-4">
+                            <div class="grid grid-cols-2 gap-4 mb-4">
+                                <div>
+                                    <label class="block text-gray-300 mb-2">Variable</label>
+                                    <select class="w-full bg-gray-800 text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500">
+                                        <option>x</option>
+                                        <option>y</option>
+                                        <option>t</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-gray-300 mb-2">Type</label>
+                                    <select class="w-full bg-gray-800 text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500">
+                                        <option>Indefinite</option>
+                                        <option>Definite</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4" id="definite-bounds" style="display: none;">
+                                <div>
+                                    <label class="block text-gray-300 mb-2">Lower Bound</label>
+                                    <input type="text" class="w-full bg-gray-800 text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500" placeholder="a">
+                                </div>
+                                <div>
+                                    <label class="block text-gray-300 mb-2">Upper Bound</label>
+                                    <input type="text" class="w-full bg-gray-800 text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500" placeholder="b">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div id="limit-options" class="operation-options hidden mb-4">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-gray-300 mb-2">Variable</label>
+                                    <select class="w-full bg-gray-800 text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500">
+                                        <option>x</option>
+                                        <option>y</option>
+                                        <option>t</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-gray-300 mb-2">Approaches</label>
+                                    <input type="text" class="w-full bg-gray-800 text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500" placeholder="a">
+                                </div>
+                            </div>
+                            <div class="mt-4">
+                                <label class="block text-gray-300 mb-2">Direction</label>
+                                <select class="w-full bg-gray-800 text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500">
+                                    <option>Two-sided</option>
+                                    <option>From left</option>
+                                    <option>From right</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="block text-gray-300 mb-2">Function</label>
+                            <div class="relative">
+                                <input type="text" id="function-input" class="w-full bg-gray-800 text-white rounded-lg px-4 py-3 pr-12 focus:outline-none focus:ring-2 focus:ring-red-500" placeholder="e.g., x^2 + sin(x)">
+                                <button class="absolute right-3 top-3 text-gray-400 hover:text-white" id="function-help">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <button id="calculate-btn" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-lg transition">
+                            Calculate
+                        </button>
+                    </div>
+                    
+                    <div class="gradient-bg rounded-xl p-6 shadow-lg">
+                        <h3 class="text-xl font-semibold mb-4 text-white">Hasil</h3>
+                        <div id="result-container" class="min-h-32 bg-gray-900 rounded-lg p-4">
+                            <p class="text-gray-400">Hasil Anda akan muncul di sini...</p>
+                        </div>
+                        <div id="steps-container" class="mt-4 hidden">
+                            <h4 class="text-lg font-medium mb-2 text-gray-300">Langka-Langka</h4>
+                            <div id="steps-content" class="bg-gray-900 rounded-lg p-4 text-gray-300">
+                                <!-- Steps will be added here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <div class="gradient-bg rounded-xl p-6 shadow-lg mb-6">
+                        <h3 class="text-xl font-semibold mb-4 text-white">Calculator Keyboard</h3>
+                        <div class="grid grid-cols-4 gap-3 mb-3">
+                            <button class="calculator-btn bg-gray-700 hover:bg-gray-600 text-white font-medium py-3 rounded-lg">1</button>
+                            <button class="calculator-btn bg-gray-700 hover:bg-gray-600 text-white font-medium py-3 rounded-lg">2</button>
+                            <button class="calculator-btn bg-gray-700 hover:bg-gray-600 text-white font-medium py-3 rounded-lg">3</button>
+                            <button class="calculator-btn bg-red-600 hover:bg-red-700 text-white font-medium py-3 rounded-lg">+</button>
+                        </div>
+                        <div class="grid grid-cols-4 gap-3 mb-3">
+                            <button class="calculator-btn bg-gray-700 hover:bg-gray-600 text-white font-medium py-3 rounded-lg">4</button>
+                            <button class="calculator-btn bg-gray-700 hover:bg-gray-600 text-white font-medium py-3 rounded-lg">5</button>
+                            <button class="calculator-btn bg-gray-700 hover:bg-gray-600 text-white font-medium py-3 rounded-lg">6</button>
+                            <button class="calculator-btn bg-red-600 hover:bg-red-700 text-white font-medium py-3 rounded-lg">-</button>
+                        </div>
+                        <div class="grid grid-cols-4 gap-3 mb-3">
+                            <button class="calculator-btn bg-gray-700 hover:bg-gray-600 text-white font-medium py-3 rounded-lg">7</button>
+                            <button class="calculator-btn bg-gray-700 hover:bg-gray-600 text-white font-medium py-3 rounded-lg">8</button>
+                            <button class="calculator-btn bg-gray-700 hover:bg-gray-600 text-white font-medium py-3 rounded-lg">9</button>
+                            <button class="calculator-btn bg-red-600 hover:bg-red-700 text-white font-medium py-3 rounded-lg">×</button>
+                        </div>
+                        <div class="grid grid-cols-4 gap-3 mb-3">
+                            <button class="calculator-btn bg-gray-700 hover:bg-gray-600 text-white font-medium py-3 rounded-lg">0</button>
+                            <button class="calculator-btn bg-gray-700 hover:bg-gray-600 text-white font-medium py-3 rounded-lg">.</button>
+                            <button class="calculator-btn bg-gray-700 hover:bg-gray-600 text-white font-medium py-3 rounded-lg">(</button>
+                            <button class="calculator-btn bg-red-600 hover:bg-red-700 text-white font-medium py-3 rounded-lg">÷</button>
+                        </div>
+                        <div class="grid grid-cols-4 gap-3">
+                            <button class="calculator-btn bg-gray-700 hover:bg-gray-600 text-white font-medium py-3 rounded-lg">x</button>
+                            <button class="calculator-btn bg-gray-700 hover:bg-gray-600 text-white font-medium py-3 rounded-lg">y</button>
+                            <button class="calculator-btn bg-gray-700 hover:bg-gray-600 text-white font-medium py-3 rounded-lg">^</button>
+                            <button class="calculator-btn bg-red-600 hover:bg-red-700 text-white font-medium py-3 rounded-lg">=</button>
+                        </div>
+                    </div>
+                    
+                    <div class="gradient-bg rounded-xl p-6 shadow-lg">
+                        <h3 class="text-xl font-semibold mb-4 text-white">Functions</h3>
+                        <div class="grid grid-cols-3 gap-3">
+                            <button class="calculator-btn bg-gray-700 hover:bg-gray-600 text-white font-medium py-2 rounded-lg">sin</button>
+                            <button class="calculator-btn bg-gray-700 hover:bg-gray-600 text-white font-medium py-2 rounded-lg">cos</button>
+                            <button class="calculator-btn bg-gray-700 hover:bg-gray-600 text-white font-medium py-2 rounded-lg">tan</button>
+                            <button class="calculator-btn bg-gray-700 hover:bg-gray-600 text-white font-medium py-2 rounded-lg">ln</button>
+                            <button class="calculator-btn bg-gray-700 hover:bg-gray-600 text-white font-medium py-2 rounded-lg">log</button>
+                            <button class="calculator-btn bg-gray-700 hover:bg-gray-600 text-white font-medium py-2 rounded-lg">e^x</button>
+                            <button class="calculator-btn bg-gray-700 hover:bg-gray-600 text-white font-medium py-2 rounded-lg">√</button>
+                            <button class="calculator-btn bg-gray-700 hover:bg-gray-600 text-white font-medium py-2 rounded-lg">π</button>
+                            <button class="calculator-btn bg-gray-700 hover:bg-gray-600 text-white font-medium py-2 rounded-lg">∞</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Practice Tab -->
+        <div id="practice" class="tab-content">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold mb-4 gradient-text">Soal Latihan</h2>
+                <p class="text-gray-300">Tantang kemampuan kalkulus Anda dengan soal-soal interaktif yang menarik dan menantang!</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <div>
+                    <label class="block text-gray-300 mb-2">Tingkat Kesulitan</label>
+                    <select id="difficulty-select" class="w-full bg-gray-800 text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500">
+                        <option value="all">All Levels</option>
+                        <option value="easy">Easy</option>
+                        <option value="medium">Medium</option>
+                        <option value="hard">Hard</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-gray-300 mb-2">Topic</label>
+                    <select id="topic-select" class="w-full bg-gray-800 text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500">
+                        <option value="all">All Topics</option>
+                        <option value="derivatives">Derivatives</option>
+                        <option value="integrals">Integrals</option>
+                        <option value="limits">Limits</option>
+                        <option value="applications">Applications</option>
+                    </select>
+                </div>
+            </div>
+            
+            <button id="generate-questions" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-lg mb-8 transition">
+                Tampilkan Soal
+            </button>
+            
+            <div id="questions-container">
+                <!-- Questions will be loaded here -->
+                <div class="text-center py-12">
+                    <p class="text-gray-400">Klik 'Buat Pertanyaan' untuk mulai berlatih.</p>
+                </div>
+            </div>
+            
+            <div id="quiz-results" class="hidden mt-8 gradient-bg rounded-xl p-6 shadow-lg">
+                <h3 class="text-xl font-semibold mb-4 text-white">Quiz Results</h3>
+                <div class="flex items-center mb-4">
+                    <div class="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center mr-4">
+                        <span class="text-white text-2xl font-bold" id="score-percentage">0%</span>
+                    </div>
+                    <div>
+                        <p class="text-gray-300">You scored <span id="correct-count" class="text-white font-bold">0</span> out of <span id="total-questions" class="text-white font-bold">0</span></p>
+                        <div class="w-full bg-gray-700 rounded-full h-2.5 mt-2">
+                            <div id="score-bar" class="bg-red-600 h-2.5 rounded-full" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+                <button id="try-again" class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-6 rounded-lg transition">
+                    Try Again
+                </button>
+            </div>
+        </div>
+
+        <!-- About Tab -->
+        <div id="about" class="tab-content">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold mb-4 gradient-text">Tentang Kalkulus Master</h2>
+                <p class="text-gray-300">Teman belajar kalkulus interaktif Anda.</p>
+            </div>
+            
+            <div class="gradient-bg rounded-xl p-6 shadow-lg mb-8">
+                <h3 class="text-xl font-semibold mb-4 text-white">Misi Kami</h3>
+                <p class="text-gray-300 mb-4">
+                    Belajar Kalkulus hadir untuk membantu pelajar dan pencinta matematika memahami dan mempraktikkan konsep kalkulus secara interaktif dan menyenangkan.
+Kami percaya bahwa kalkulus bukan hanya untuk segelintir orang tetapi siapa pun berhak memahaminya. Karena itu, kami merancang alat ini untuk menyederhanakan konsep-konsep kompleks, agar lebih mudah dipahami dan diterapkan oleh semua orang.
+                </p>
+                <p class="text-gray-300">
+                    Apakah Anda sedang menghadapi ujian, mengerjakan tugas, atau sekadar ingin memperdalam pemahaman kalkulus? Kalkulator dan latihan soal kami siap membantu Anda membangun kepercayaan diri dan mengasah keterampilan secara efektif.
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                <div class="gradient-bg rounded-xl p-6 shadow-lg">
+                    <h3 class="text-xl font-semibold mb-4 text-white">Fitur-fitur</h3>
+                    <ul class="space-y-3 text-gray-300">
+                        <li class="flex items-start">
+                            <svg class="w-5 h-5 text-red-500 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            <span>Kalkulator Kalkulus Cerdas</span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="w-5 h-5 text-red-500 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            <span>Latihan Soal Interaktif dengan Penilaian Instan</span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="w-5 h-5 text-red-500 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            <span>Mendukung Beragam Operasi Kalkulus</span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="w-5 h-5 text-red-500 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            <span>Desain Modern dengan Tema Gelap yang Elegan</span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="gradient-bg rounded-xl p-6 shadow-lg">
+                    <h3 class="text-xl font-semibold mb-4 text-white">Cara Penggunaan</h3>
+                    <ol class="space-y-4 text-gray-300">
+                        <li class="flex">
+                            <span class="bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center mr-3 flex-shrink-0">1</span>
+                            <span>Gunakan fitur kalkulator untuk mengerjakan soal kalkulus: ketik fungsi Anda, pilih operasi seperti turunan atau integral, dan lihat hasilnya langsung.</span>
+                        </li>
+                        <li class="flex">
+                            <span class="bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center mr-3 flex-shrink-0">2</span>
+                            <span>Asah kemampuan Anda di tab latihan dengan soal-soal acak — pilih sendiri tingkat kesulitan dan topik sesuai kebutuhan.</span>
+                        </li>
+                        <li class="flex">
+                            <span class="bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center mr-3 flex-shrink-0">3</span>
+                            <span>Lihat kembali hasil Anda dan pelajari langkah-langkah penyelesaiannya untuk memperdalam pemahaman.</span>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+            
+            <div class="gradient-bg rounded-xl p-6 shadow-lg">
+                <h3 class="text-xl font-semibold mb-4 text-white">Contact</h3>
+                <p class="text-gray-300 mb-4">
+                    Ingin bertanya atau memberi masukan? Jangan ragu untuk berbagi dengan kami!
+                </p>
+                <div class="flex space-x-4">
+                    <a href="#" class="text-red-400 hover:text-red-300 transition">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                        </svg>
+                    </a>
+                    <a href="#" class="text-red-400 hover:text-red-300 transition">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M22.675 0h-21.35c-.732 0-1.325.593-1.325 1.325v21.351c0 .731.593 1.324 1.325 1.324h11.495v-9.294h-3.128v-3.622h3.128v-2.671c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.795.715-1.795 1.763v2.313h3.587l-.467 3.622h-3.12v9.293h6.116c.73 0 1.323-.593 1.323-1.325v-21.35c0-.732-.593-1.325-1.325-1.325z"/>
+                        </svg>
+                    </a>
+                    <a href="#" class="text-red-400 hover:text-red-300 transition">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                        </svg>
+                    </a>
+                    <a href="#" class="text-red-400 hover:text-red-300 transition">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 12.713l-11.985-9.713h23.97l-11.985 9.713zm0 2.574l-12-9.725v15.438h24v-15.438l-12 9.725z"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="gradient-bg border-t border-gray-800 mt-12">
+        <div class="container mx-auto px-4 py-6">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="flex items-center space-x-2 mb-4 md:mb-0">
+                    <div class="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center">
+                        <span class="text-white font-bold text-sm">∫</span>
+                    </div>
+                    <span class="text-white font-bold gradient-text">Belajar Kalkulus</span>
+                </div>
+                <div class="text-gray-400 text-sm">
+                    © 2025 Belajar Kalkulus. All rights reserved.
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Help Modal -->
+    <div id="help-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-gray-800 rounded-xl p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-semibold text-white">Function Input Help</h3>
+                <button id="close-help" class="text-gray-400 hover:text-white">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="text-gray-300 space-y-4">
+                <p>Enter mathematical functions using standard notation. Here are some examples:</p>
+                
+                <div class="bg-gray-900 p-4 rounded-lg">
+                    <h4 class="font-medium text-white mb-2">Basic Operations</h4>
+                    <ul class="space-y-1">
+                        <li>Addition: <code class="bg-gray-700 px-1 rounded">x + 2</code></li>
+                        <li>Subtraction: <code class="bg-gray-700 px-1 rounded">3 - x</code></li>
+                        <li>Multiplication: <code class="bg-gray-700 px-1 rounded">2*x</code> or <code class="bg-gray-700 px-1 rounded">2x</code></li>
+                        <li>Division: <code class="bg-gray-700 px-1 rounded">(x+1)/(x-1)</code></li>
+                        <li>Exponents: <code class="bg-gray-700 px-1 rounded">x^2</code> or <code class="bg-gray-700 px-1 rounded">e^(2x)</code></li>
+                    </ul>
+                </div>
+                
+                <div class="bg-gray-900 p-4 rounded-lg">
+                    <h4 class="font-medium text-white mb-2">Functions</h4>
+                    <ul class="space-y-1">
+                        <li>Trigonometric: <code class="bg-gray-700 px-1 rounded">sin(x)</code>, <code class="bg-gray-700 px-1 rounded">cos(2x)</code>, <code class="bg-gray-700 px-1 rounded">tan(x/2)</code></li>
+                        <li>Logarithmic: <code class="bg-gray-700 px-1 rounded">ln(x)</code>, <code class="bg-gray-700 px-1 rounded">log10(x)</code></li>
+                        <li>Exponential: <code class="bg-gray-700 px-1 rounded">exp(x)</code> or <code class="bg-gray-700 px-1 rounded">e^x</code></li>
+                        <li>Square root: <code class="bg-gray-700 px-1 rounded">sqrt(x)</code> or <code class="bg-gray-700 px-1 rounded">x^(1/2)</code></li>
+                    </ul>
+                </div>
+                
+                <div class="bg-gray-900 p-4 rounded-lg">
+                    <h4 class="font-medium text-white mb-2">Constants</h4>
+                    <ul class="space-y-1">
+                        <li>π (pi): <code class="bg-gray-700 px-1 rounded">pi</code></li>
+                        <li>e (Euler's number): <code class="bg-gray-700 px-1 rounded">e</code></li>
+                        <li>∞ (infinity): <code class="bg-gray-700 px-1 rounded">inf</code></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Navigation functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mobile menu toggle
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            
+            mobileMenuButton.addEventListener('click', function() {
+                mobileMenu.classList.toggle('hidden');
+            });
+            
+            // Tab switching
+            const navLinks = document.querySelectorAll('.nav-link');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const tabId = this.getAttribute('data-tab');
+                    
+                    // Hide all tab contents
+                    tabContents.forEach(content => {
+                        content.classList.remove('active');
+                    });
+                    
+                    // Show selected tab content
+                    document.getElementById(tabId).classList.add('active');
+                    
+                    // Update active nav link styling
+                    navLinks.forEach(navLink => {
+                        navLink.classList.remove('text-red-300');
+                        navLink.classList.add('text-white');
+                    });
+                    
+                    // If not mobile menu link, update styling
+                    if (!this.classList.contains('mobile-link')) {
+                        this.classList.remove('text-white');
+                        this.classList.add('text-red-300');
+                    }
+                    
+                    // Close mobile menu if open
+                    if (!mobileMenu.classList.contains('hidden')) {
+                        mobileMenu.classList.add('hidden');
+                    }
+                });
+            });
+            
+            // Calculator operation switching
+            const operationBtns = document.querySelectorAll('.operation-btn');
+            const operationOptions = document.querySelectorAll('.operation-options');
+            
+            operationBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const operation = this.getAttribute('data-operation');
+                    
+                    // Update button styling
+                    operationBtns.forEach(b => {
+                        b.classList.remove('bg-red-600');
+                        b.classList.add('bg-gray-700', 'hover:bg-gray-600');
+                    });
+                    this.classList.remove('bg-gray-700', 'hover:bg-gray-600');
+                    this.classList.add('bg-red-600');
+                    
+                    // Hide all options
+                    operationOptions.forEach(option => {
+                        option.classList.add('hidden');
+                    });
+                    
+                    // Show selected option
+                    document.getElementById(`${operation}-options`).classList.remove('hidden');
+                    
+                    // Special handling for integral definite bounds
+                    if (operation === 'integral') {
+                        const integralType = document.querySelector('#integral-options select');
+                        integralType.addEventListener('change', function() {
+                            if (this.value === 'Definite') {
+                                document.getElementById('definite-bounds').style.display = 'grid';
+                            } else {
+                                document.getElementById('definite-bounds').style.display = 'none';
+                            }
+                        });
+                    }
+                });
+            });
+            
+            // Set derivative as default operation
+            document.querySelector('[data-operation="derivative"]').click();
+            
+            // Calculator keyboard functionality
+            const calculatorButtons = document.querySelectorAll('.calculator-btn');
+            const functionInput = document.getElementById('function-input');
+            
+            calculatorButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const buttonText = this.textContent;
+                    const currentPos = functionInput.selectionStart;
+                    const currentValue = functionInput.value;
+                    
+                    // Handle special cases
+                    if (buttonText === '×') {
+                        functionInput.value = currentValue.substring(0, currentPos) + '*' + currentValue.substring(currentPos);
+                    } else if (buttonText === '÷') {
+                        functionInput.value = currentValue.substring(0, currentPos) + '/' + currentValue.substring(currentPos);
+                    } else {
+                        functionInput.value = currentValue.substring(0, currentPos) + buttonText + currentValue.substring(currentPos);
+                    }
+                    
+                    // Move cursor position
+                    functionInput.selectionStart = currentPos + 1;
+                    functionInput.selectionEnd = currentPos + 1;
+                    functionInput.focus();
+                });
+            });
+            
+            // Help modal functionality
+            const helpModal = document.getElementById('help-modal');
+            const functionHelp = document.getElementById('function-help');
+            const closeHelp = document.getElementById('close-help');
+            
+            functionHelp.addEventListener('click', function() {
+                helpModal.classList.remove('hidden');
+            });
+            
+            closeHelp.addEventListener('click', function() {
+                helpModal.classList.add('hidden');
+            });
+            
+            // Close modal when clicking outside
+            helpModal.addEventListener('click', function(e) {
+                if (e.target === helpModal) {
+                    helpModal.classList.add('hidden');
+                }
+            });
+            
+            // Calculate button functionality
+            const calculateBtn = document.getElementById('calculate-btn');
+            const resultContainer = document.getElementById('result-container');
+            const stepsContainer = document.getElementById('steps-container');
+            const stepsContent = document.getElementById('steps-content');
+            
+            calculateBtn.addEventListener('click', function() {
+                const functionText = functionInput.value.trim();
+                if (!functionText) {
+                    resultContainer.innerHTML = '<p class="text-red-400">Please enter a function</p>';
+                    return;
+                }
+                
+                // Get current operation
+                const activeOperationBtn = document.querySelector('.operation-btn.bg-red-600');
+                const operation = activeOperationBtn.getAttribute('data-operation');
+                
+                // Show loading state
+                resultContainer.innerHTML = '<p class="text-gray-400">Calculating...</p>';
+                stepsContainer.classList.add('hidden');
+                
+                // Simulate calculation (in a real app, this would call a math engine)
+                setTimeout(() => {
+                    let result, steps;
+                    
+                    switch(operation) {
+                        case 'derivative':
+                            result = `\\[ \\frac{d}{dx}\\left(${functionText}\\right) = 2x + \\cos(x) \\]`;
+                            steps = `
+                                <p class="mb-2">Step 1: Apply the power rule to each term</p>
+                                <p class="mb-2">\\[ \\frac{d}{dx}(x^2) = 2x \\]</p>
+                                <p class="mb-2">Step 2: Differentiate the trigonometric function</p>
+                                <p>\\[ \\frac{d}{dx}(\\sin(x)) = \\cos(x) \\]</p>
+                            `;
+                            break;
+                        case 'integral':
+                            result = `\\[ \\int ${functionText} \\, dx = \\frac{x^3}{3} - \\cos(x) + C \\]`;
+                            steps = `
+                                <p class="mb-2">Step 1: Integrate each term separately</p>
+                                <p class="mb-2">\\[ \\int x^2 \\, dx = \\frac{x^3}{3} \\]</p>
+                                <p class="mb-2">Step 2: Integrate the trigonometric function</p>
+                                <p>\\[ \\int \\sin(x) \\, dx = -\\cos(x) \\]</p>
+                            `;
+                            break;
+                        case 'limit':
+                            result = `\\[ \\lim_{x \\to 2} ${functionText} = 6 \\]`;
+                            steps = `
+                                <p class="mb-2">Step 1: Substitute x = 2 into the function</p>
+                                <p class="mb-2">\\[ (2)^2 + 2 = 4 + 2 = 6 \\]</p>
+                                <p>The function is continuous at x = 2, so the limit equals the function value.</p>
+                            `;
+                            break;
+                        default:
+                            result = '<p class="text-red-400">Invalid operation</p>';
+                    }
+                    
+                    resultContainer.innerHTML = result;
+                    stepsContent.innerHTML = steps;
+                    stepsContainer.classList.remove('hidden');
+                    
+                    // Render MathJax after content is loaded
+                    if (typeof MathJax !== 'undefined') {
+                        MathJax.typesetPromise([resultContainer, stepsContent]).catch(err => console.log(err));
+                    }
+                }, 800);
+            });
+            
+            // Practice questions functionality
+            const generateQuestionsBtn = document.getElementById('generate-questions');
+            const questionsContainer = document.getElementById('questions-container');
+            const quizResults = document.getElementById('quiz-results');
+            const tryAgainBtn = document.getElementById('try-again');
+            
+            generateQuestionsBtn.addEventListener('click', function() {
+                // Show loading state
+                questionsContainer.innerHTML = '<div class="text-center py-12"><p class="text-gray-400">Generating questions...</p></div>';
+                quizResults.classList.add('hidden');
+                
+                // Get selected difficulty and topic
+                const difficulty = document.getElementById('difficulty-select').value;
+                const topic = document.getElementById('topic-select').value;
+                
+                // Simulate API call
+                setTimeout(() => {
+                    const questions = generatePracticeQuestions(difficulty, topic);
+                    displayQuestions(questions);
+                }, 600);
+            });
+            
+            tryAgainBtn.addEventListener('click', function() {
+                quizResults.classList.add('hidden');
+                generateQuestionsBtn.click();
+            });
+            
+            function generatePracticeQuestions(difficulty, topic) {
+                // This would come from a database in a real app
+                const questionBank = [
+                    {
+                        id: 1,
+                        question: "What is the derivative of \\( f(x) = 3x^2 + 2x - 5 \\) with respect to x?",
+                        options: [
+                            "6x + 2",
+                            "3x + 2",
+                            "6x^2 + 2",
+                            "3x^2 + 2x"
+                        ],
+                        answer: 0,
+                        explanation: "Apply the power rule to each term: the derivative of \\( 3x^2 \\) is \\( 6x \\), the derivative of \\( 2x \\) is \\( 2 \\), and the derivative of a constant is 0.",
+                        difficulty: "easy",
+                        topic: "derivatives"
+                    },
+                    {
+                        id: 2,
+                        question: "Evaluate the integral \\( \\int (4x^3 + 3x^2) \\, dx \\)",
+                        options: [
+                            "\\( x^4 + x^3 + C \\)",
+                            "\\( 12x^2 + 6x + C \\)",
+                            "\\( 4x^4 + 3x^3 + C \\)",
+                            "\\( x^4 + 3x^3 + C \\)"
+                        ],
+                        answer: 0,
+                        explanation: "Apply the power rule for integration to each term: \\( \\int 4x^3 \\, dx = x^4 \\) and \\( \\int 3x^2 \\, dx = x^3 \\). Don't forget the constant of integration.",
+                        difficulty: "easy",
+                        topic: "integrals"
+                    },
+                    {
+                        id: 3,
+                        question: "Find \\( \\lim_{x \\to 3} \\frac{x^2 - 9}{x - 3} \\)",
+                        options: [
+                            "6",
+                            "0",
+                            "Undefined",
+                            "3"
+                        ],
+                        answer: 0,
+                        explanation: "Factor the numerator: \\( \\frac{(x-3)(x+3)}{x-3} = x+3 \\) for \\( x \\neq 3 \\). Then substitute x = 3 to get 6.",
+                        difficulty: "medium",
+                        topic: "limits"
+                    },
+                    {
+                        id: 4,
+                        question: "What is the derivative of \\( \\sin(2x) \\) with respect to x?",
+                        options: [
+                            "\\( 2\\cos(2x) \\)",
+                            "\\( \\cos(2x) \\)",
+                            "\\( -2\\cos(2x) \\)",
+                            "\\( 2\\sin(x)\\cos(x) \\)"
+                        ],
+                        answer: 0,
+                        explanation: "Use the chain rule: the derivative of the outer function \\( \\sin(u) \\) is \\( \\cos(u) \\), multiplied by the derivative of the inner function \\( 2x \\) which is 2.",
+                        difficulty: "medium",
+                        topic: "derivatives"
+                    },
+                    {
+                        id: 5,
+                        question: "Evaluate \\( \\int_0^\\pi \\sin(x) \\, dx \\)",
+                        options: [
+                            "2",
+                            "0",
+                            "1",
+                            "\\( \\pi \\)"
+                        ],
+                        answer: 0,
+                        explanation: "The antiderivative of \\( \\sin(x) \\) is \\( -\\cos(x) \\). Evaluating from 0 to π: \\( -\\cos(\\pi) - (-\\cos(0)) = -(-1) - (-1) = 2 \\).",
+                        difficulty: "medium",
+                        topic: "integrals"
+                    },
+                    {
+                        id: 6,
+                        question: "Find the derivative of \\( f(x) = e^{3x} \\ln(x) \\)",
+                        options: [
+                            "\\( e^{3x}\\left(3\\ln(x) + \\frac{1}{x}\\right) \\)",
+                            "\\( 3e^{3x}\\ln(x) + \\frac{e^{3x}}{x} \\)",
+                            "\\( e^{3x}\\left(\\ln(x) + \\frac{1}{x}\\right) \\)",
+                            "\\( 3e^{3x} + \\frac{1}{x} \\)"
+                        ],
+                        answer: 0,
+                        explanation: "Use the product rule: \\( f'(x) = e^{3x} \\cdot 3 \\cdot \\ln(x) + e^{3x} \\cdot \\frac{1}{x} = e^{3x}\\left(3\\ln(x) + \\frac{1}{x}\\right) \\).",
+                        difficulty: "hard",
+                        topic: "derivatives"
+                    },
+                    {
+                        id: 7,
+                        question: "Evaluate \\( \\lim_{x \\to 0} \\frac{\\tan(x)}{x} \\)",
+                        options: [
+                            "1",
+                            "0",
+                            "Undefined",
+                            "\\( \\infty \\)"
+                        ],
+                        answer: 0,
+                        explanation: "This is a standard limit that equals 1. You can use L'Hôpital's rule or the approximation \\( \\tan(x) \\approx x \\) for small x.",
+                        difficulty: "hard",
+                        topic: "limits"
+                    },
+                    {
+                        id: 8,
+                        question: "Find the area between the curves \\( y = x^2 \\) and \\( y = 2x - x^2 \\)",
+                        options: [
+                            "\\( \\frac{1}{3} \\)",
+                            "\\( \\frac{2}{3} \\)",
+                            "1",
+                            "\\( \\frac{4}{3} \\)"
+                        ],
+                        answer: 0,
+                        explanation: "First find intersection points at x=0 and x=1. The top curve is \\( 2x - x^2 \\) and the bottom is \\( x^2 \\). The integral is \\( \\int_0^1 (2x - 2x^2) dx = [x^2 - \\frac{2}{3}x^3]_0^1 = \\frac{1}{3} \\).",
+                        difficulty: "hard",
+                        topic: "applications"
+                    }
+                ];
+                
+                // Filter questions based on difficulty and topic
+                let filteredQuestions = questionBank;
+                
+                if (difficulty !== 'all') {
+                    filteredQuestions = filteredQuestions.filter(q => q.difficulty === difficulty);
+                }
+                
+                if (topic !== 'all') {
+                    filteredQuestions = filteredQuestions.filter(q => q.topic === topic);
+                }
+                
+                // Shuffle and select 5 questions
+                return shuffleArray(filteredQuestions).slice(0, 5);
+            }
+            
+            function shuffleArray(array) {
+                for (let i = array.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [array[i], array[j]] = [array[j], array[i]];
+                }
+                return array;
+            }
+            
+            function displayQuestions(questions) {
+                if (questions.length === 0) {
+                    questionsContainer.innerHTML = '<div class="text-center py-12"><p class="text-gray-400">No questions found for the selected criteria.</p></div>';
+                    return;
+                }
+                
+                let html = '';
+                questions.forEach((q, index) => {
+                    html += `
+                        <div class="question-card bg-gray-800 rounded-xl p-6 shadow-lg mb-6" data-question-id="${q.id}">
+                            <div class="flex items-start mb-4">
+                                <span class="bg-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center mr-3 flex-shrink-0">${index + 1}</span>
+                                <div>
+                                    <h3 class="text-lg font-medium text-white">${q.question}</h3>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+                                ${q.options.map((opt, i) => `
+                                    <button class="answer-btn bg-gray-700 hover:bg-gray-600 text-white text-left p-3 rounded-lg transition" data-answer="${i}">
+                                        ${opt}
+                                    </button>
+                                `).join('')}
+                            </div>
+                            <div class="explanation hidden bg-gray-900 rounded-lg p-4 text-gray-300">
+                                <h4 class="font-medium text-white mb-2">Explanation:</h4>
+                                <p>${q.explanation}</p>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                html += `
+                    <div class="text-center mt-8">
+                        <button id="submit-quiz" class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 rounded-full transition">
+                            Submit Quiz
+                        </button>
+                    </div>
+                `;
+                
+                questionsContainer.innerHTML = html;
+                
+                // Answer button functionality
+                const answerBtns = document.querySelectorAll('.answer-btn');
+                answerBtns.forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const questionCard = this.closest('.question-card');
+                        const questionId = questionCard.getAttribute('data-question-id');
+                        const answerIndex = this.getAttribute('data-answer');
+                        
+                        // Store selected answer
+                        questionCard.setAttribute('data-selected', answerIndex);
+                        
+                        // Remove selection from other buttons in this question
+                        questionCard.querySelectorAll('.answer-btn').forEach(b => {
+                            b.classList.remove('bg-red-600', 'border', 'border-red-500');
+                        });
+                        
+                        // Highlight selected button
+                        this.classList.add('bg-red-600', 'border', 'border-red-500');
+                    });
+                });
+                
+                // Submit quiz functionality
+                const submitQuizBtn = document.getElementById('submit-quiz');
+                submitQuizBtn.addEventListener('click', function() {
+                    const questionCards = document.querySelectorAll('.question-card');
+                    let correctCount = 0;
+                    let totalQuestions = questionCards.length;
+                    
+                    questionCards.forEach(card => {
+                        const questionId = card.getAttribute('data-question-id');
+                        const selectedAnswer = card.getAttribute('data-selected');
+                        const correctAnswer = questions.find(q => q.id == questionId).answer;
+                        const explanation = card.querySelector('.explanation');
+                        
+                        // Show explanation
+                        explanation.classList.remove('hidden');
+                        
+                        // Check if answer is correct
+                        if (selectedAnswer && parseInt(selectedAnswer) === correctAnswer) {
+                            correctCount++;
+                            card.querySelector(`[data-answer="${selectedAnswer}"]`).classList.add('correct-answer');
+                        } else if (selectedAnswer) {
+                            card.querySelector(`[data-answer="${selectedAnswer}"]`).classList.add('wrong-answer');
+                        }
+                        
+                        // Highlight correct answer
+                        card.querySelector(`[data-answer="${correctAnswer}"]`).classList.add('correct-answer');
+                    });
+                    
+                    // Calculate score
+                    const scorePercentage = Math.round((correctCount / totalQuestions) * 100);
+                    
+                    // Show results
+                    document.getElementById('score-percentage').textContent = `${scorePercentage}%`;
+                    document.getElementById('correct-count').textContent = correctCount;
+                    document.getElementById('total-questions').textContent = totalQuestions;
+                    document.getElementById('score-bar').style.width = `${scorePercentage}%`;
+                    
+                    // Scroll to results
+                    quizResults.classList.remove('hidden');
+                    quizResults.scrollIntoView({ behavior: 'smooth' });
+                    
+                    // Disable answer buttons after submission
+                    answerBtns.forEach(btn => {
+                        btn.disabled = true;
+                    });
+                    
+                    // Change submit button text
+                    submitQuizBtn.textContent = 'Quiz Submitted';
+                    submitQuizBtn.disabled = true;
+                    submitQuizBtn.classList.remove('bg-red-600', 'hover:bg-red-700');
+                    submitQuizBtn.classList.add('bg-gray-600');
+                });
+                
+                // Render MathJax for questions
+                if (typeof MathJax !== 'undefined') {
+                    MathJax.typesetPromise([questionsContainer]).catch(err => console.log(err));
+                }
+            }
+        });
+    </script>
+</body>
+</html>
